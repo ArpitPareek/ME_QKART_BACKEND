@@ -1,4 +1,4 @@
-const { User } = require("../../src/models");
+const  User  = require("../../src/models/user.model");
 const { userOne } = require("../fixtures/user.fixture");
 const { userService } = require("../../src/services");
 const ApiError = require("../../src/utils/ApiError");
@@ -15,7 +15,6 @@ describe("User test", () => {
       mockingoose(User).toReturn(userOne, "findOne");
 
       let userResponse = await userService.getUserByEmail(userOne.email);
-
       // Use toEqual() to compare objects
       expect(userResponse._id).toEqual(userOne._id);
 

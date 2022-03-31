@@ -1,4 +1,4 @@
-const User  = require("../models/user.model");
+const {User}  = require("../models");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const bcrypt = require("bcryptjs");
@@ -53,8 +53,7 @@ const createUser = async(user)=>{
     if(emailExits){
         throw new ApiError(httpStatus[200],"Email alreday taken");
     }else{
-        const newUser = new User(user);
-        const result = await newUser.save();
+        const result = await User.create(user)
         return result;
     }
 }

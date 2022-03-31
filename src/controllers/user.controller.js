@@ -40,14 +40,14 @@ const User = require("../models/user.model")
  */
 const getUser = catchAsync(async (req, res) => {
   const userId = req.params.userId;
-  console.log(userId)
+  //console.log(userId)
   const result = await userService.getUserById(userId)
   //const result = await User.findById(userId);
-  console.log(result)
+  //console.log(result)
   if(result){
-    res.status(200).json(result)
+    return res.status(200).send(result)
   }else{
-    console.log('at controller')
+    //console.log('at controller')
     throw new ApiError(httpStatus[404],"User not found")
   }
 });

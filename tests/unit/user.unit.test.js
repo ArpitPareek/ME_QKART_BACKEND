@@ -1,4 +1,4 @@
-const  User  = require("../../src/models/user.model");
+const  {User}  = require("../../src/models");
 const { userOne } = require("../fixtures/user.fixture");
 const { userService } = require("../../src/services");
 const ApiError = require("../../src/utils/ApiError");

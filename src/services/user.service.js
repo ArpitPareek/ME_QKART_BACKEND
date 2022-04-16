@@ -1,4 +1,4 @@
-const {User}  = require("../models");
+const { User } = require("../models");
 const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const bcrypt = require("bcryptjs");
@@ -10,10 +10,9 @@ const bcrypt = require("bcryptjs");
  * @param {String} id
  * @returns {Promise<User>}
  */
-const getUserById = async(id)=>{
-    const result = await User.findById(id);
-    return result
-}
+const getUserById = async (id) => {
+  return User.findById(id);
+};
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUserByEmail(email)
 /**
@@ -22,10 +21,10 @@ const getUserById = async(id)=>{
  * @param {string} email
  * @returns {Promise<User>}
  */
-const getUserByEmail = async(email)=>{
-    const result = await User.findOne({email});
-    return result
-}
+const getUserByEmail = async (email) => {
+  return User.findOne({ email });
+};
+
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement createUser(user)
 /**
  * Create a user
@@ -48,14 +47,24 @@ const getUserByEmail = async(email)=>{
  *
  * 200 status code on duplicate email - https://stackoverflow.com/a/53144807
  */
-const createUser = async(user)=>{
-    const emailExits =await User.isEmailTaken(user.email);
-    if(emailExits){
-        throw new ApiError(httpStatus[200],"Email alreday taken");
-    }else{
-        const result = await User.create(user)
-        return result;
-    }
-}
+// CRIO_SOLUTION_START_MODULE_UNDERSTANDING_BASICS
+const createUser = async (userBody) => {
+  if (await User.isEmailTaken(userBody.email)) {
+    throw new ApiError(httpStatus.OK, "Email already taken");
+  }
 
-module.exports = {getUserById,getUserByEmail,createUser}
+  const hashedPassword = await bcrypt.hash(userBody.password, 10);
+
+  const user = await User.create({...userBody, password: hashedPassword});
+  return user;
+};
+// CRIO_SOLUTION_END_MODULE_UNDERSTANDING_BASICS
+
+
+// CRIO_SOLUTION_START_MODULE_UNDERSTANDING_BASICS
+module.exports = {
+  getUserById,
+  getUserByEmail,
+  createUser,
+};
+// CRIO_SOLUTION_END_MODULE_UNDERSTANDING_BASICS

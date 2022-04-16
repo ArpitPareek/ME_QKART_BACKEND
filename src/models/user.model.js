@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 // NOTE - "validator" external library and not the custom middleware at src/middlewares/validate.js
 const validator = require("validator");
 const config = require("../config/config");
+const bcrypt = require("bcryptjs");
 
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Complete userSchema, a Mongoose schema for "users" collection
 const userSchema = mongoose.Schema(
@@ -14,12 +15,21 @@ const userSchema = mongoose.Schema(
     email: {
       type: String,
       required: true,
-      trim : true,
-      Unique: true,
-      Lowercase: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      // https://www.npmjs.com/package/validator
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email");
+        }
+      },
     },
     password: {
       type: String,
+      required: true,
+      trim: true,
+      minlength: 8,
       validate(value) {
         if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
           throw new Error(
@@ -27,12 +37,12 @@ const userSchema = mongoose.Schema(
           );
         }
       },
-      minlength:8
+      // private: true, // used by the toJSON plugin
     },
     walletMoney: {
       type: Number,
       required: true,
-      default: 500
+      default: config.default_wallet_money,
     },
     address: {
       type: String,
@@ -52,14 +62,21 @@ const userSchema = mongoose.Schema(
  * @returns {Promise<boolean>}
  */
 userSchema.statics.isEmailTaken = async function (email) {
-  const result = await this.model('User').find(email);
-  if(result) true
-  else false
+  const user = await this.findOne({ email });
+  return !!user;
+};
+
+/**
+ * Check if entered password matches the user's password
+ * @param {string} password
+ * @returns {Promise<boolean>}
+ */
+userSchema.methods.isPasswordMatch = async function (password) {
+  const user = this;
+  return bcrypt.compare(password, user.password);
 };
 
 
-
-// TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS
 /*
  * Create a Mongoose model out of userSchema and export the model as "User"
  * Note: The model should be accessible in a different module when imported like below
@@ -68,5 +85,9 @@ userSchema.statics.isEmailTaken = async function (email) {
 /**
  * @typedef User
  */
-const User = mongoose.model('User',userSchema);
-module.exports = {User}
+const User = mongoose.model("User", userSchema);
+
+module.exports.User = User;
+module.exports = {
+  User,
+};

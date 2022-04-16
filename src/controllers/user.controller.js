@@ -2,7 +2,7 @@ const httpStatus = require("http-status");
 const ApiError = require("../utils/ApiError");
 const catchAsync = require("../utils/catchAsync");
 const { userService } = require("../services");
-const User = require("../models/user.model")
+
 // TODO: CRIO_TASK_MODULE_UNDERSTANDING_BASICS - Implement getUser() function
 /**
  * Get user details
@@ -13,6 +13,9 @@ const User = require("../models/user.model")
  *  - If data exists for the provided "userId", return 200 status code and the object
  *  - If data doesn't exist, throw an error using `ApiError` class
  *    - Status code should be "404 NOT FOUND"
+ *    - Error message, "User not found"
+ *  - If the user whose token is provided and user whose data to be fetched don't match, throw `ApiError`
+ *    - Status code should be "403 FORBIDDEN"
  *    - Error message, "User not found"
  *
  * 
@@ -33,23 +36,29 @@ const User = require("../models/user.model")
  *
  * Example response status codes:
  * HTTP 200 - If request successfully completes
+ * HTTP 403 - If request data doesn't match that of authenticated user
  * HTTP 404 - If user entity not found in DB
  * 
+// Commented out to avoid confusion as a function parameter
+ * @param {string} req.params.userId
+ * @param {User} req.user
  * @returns {User | {address: String}}
  *
  */
 const getUser = catchAsync(async (req, res) => {
-  const userId = req.params.userId;
-  //console.log(userId)
-  const result = await userService.getUserById(userId)
-  //const result = await User.findById(userId);
-  //console.log(result)
-  if(result){
-    return res.status(200).send(result)
-  }else{
-    //console.log('at controller')
-    throw new ApiError(httpStatus[404],"User not found")
+  let data;
+    data = await userService.getUserById(req.params.userId);
+
+  if (!data) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
+  if (data.email != req.user.email) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "User not authorized to access this resource"
+    );
+  }
+    res.send(data);
 });
 
 

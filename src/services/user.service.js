@@ -62,9 +62,41 @@ const createUser = async (userBody) => {
 
 
 // CRIO_SOLUTION_START_MODULE_UNDERSTANDING_BASICS
+
+// CRIO_SOLUTION_END_MODULE_UNDERSTANDING_BASICS
+
+// TODO: CRIO_TASK_MODULE_CART - Implement getUserAddressById()
+/**
+ * Get subset of user's data by id
+ * - Should fetch from Mongo only the email and address fields for the user apart from the id
+ *
+ * @param {ObjectId} id
+ * @returns {Promise<User>}
+ */
+const getUserAddressById = async (id) => {
+  console.log("in userservice",id)
+  const user = await User.findOne({"_id":id},{address:1,email:1})
+  console.log("in line 78 of userservice",user)
+  return user
+};
+
+/**
+ * Set user's shipping address
+ * @param {String} email
+ * @returns {String}
+ */
+const setAddress = async (user, newAddress) => {
+  user.address = newAddress;
+  await user.save();
+
+  return user.address;
+};
+
 module.exports = {
   getUserById,
   getUserByEmail,
   createUser,
+  setAddress,
+  getUserAddressById
 };
-// CRIO_SOLUTION_END_MODULE_UNDERSTANDING_BASICS
+

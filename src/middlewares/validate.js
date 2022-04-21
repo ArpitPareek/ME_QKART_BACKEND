@@ -9,8 +9,6 @@ const ApiError = require("../utils/ApiError");
  */
 const validate = (schema) => (req, res, next) => {
   // Request body should be JSON, if present
-  //console.log('here in validte function')
-  //console.log("in validate.js middleware",req.headers)
   if (Object.keys(req.body).length !== 0 && !req.is("application/json")) {
     return next(
       new ApiError(

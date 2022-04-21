@@ -1,5 +1,3 @@
-// CRIO_SOLUTION_START_MODULE_UNDERSTANDING_BASICS
-// CRIO_SOLUTION_END_MODULE_UNDERSTANDING_BASICS
 // Configuration file for testing
 // Find configuration options listed here - https://jestjs.io/docs/en/configuration
 module.exports = {
@@ -9,13 +7,4 @@ module.exports = {
     NODE_ENV: "test",
   },
   restoreMocks: true,
-  // NOTE - Not used in project
-  // Not removing due to possible future usage
-  coveragePathIgnorePatterns: [
-    "node_modules",
-    "src/config",
-    "src/app.js",
-    "tests",
-  ],
-  coverageReporters: ["text", "lcov", "clover", "html"],
 };

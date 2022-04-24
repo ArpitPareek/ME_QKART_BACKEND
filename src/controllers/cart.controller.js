@@ -84,9 +84,20 @@ const updateProductInCart = catchAsync(async (req, res) => {
   }
 });
 
+/**
+ * Checkout user's cart
+ */
+const checkout = catchAsync(async (req, res) => {
+  const user = req.user
+  const userCart = await cartService.checkout(user);
+  console.log("in line 93")
+  res.status(httpStatus.NO_CONTENT).json(userCart);
+});
+
 
 module.exports = {
   getCart,
   addProductToCart,
   updateProductInCart,
+  checkout,
 };

@@ -114,7 +114,7 @@ describe("Cart test", () => {
       const updatedProduct = res.cartItems.filter(
         (cartItem) => cartItem.product._id.toString() == existingProduct._id
       );
-      
+
       expect(res.email).toEqual(userOne.email);
       expect(updatedProduct[0].quantity).toEqual(updatedQty);
     });

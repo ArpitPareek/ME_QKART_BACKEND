@@ -187,9 +187,55 @@ const deleteProductFromCart = async (user, productId) => {
   }
 };
 
+// TODO: CRIO_TASK_MODULE_TEST - Implement checkout function
+/**
+ * Checkout a users cart.
+ * On success, users cart must have no products.
+ *
+ * @param {User} user
+ * @returns {Promise}
+ * @throws {ApiError} when cart is invalid
+ */
+const checkout = async (user) => {
+  const email = user.email
+  let userCart = await Cart.findOne({email});
+  console.log(userCart)
+  if(!userCart){
+    console.log("userCart logging in not found",userCart)
+    throw new ApiError(httpStatus.NOT_FOUND,"User cart not found");
+  }
+  if(userCart.cartItems.length==0){
+    console.log("if array length is zero",userCart.cartItems.length)
+    throw new ApiError(httpStatus.BAD_REQUEST,"user cart is empty");
+  }
+  let defaultAddress = await user.hasSetNonDefaultAddress();
+  console.log(user.address)
+  if(defaultAddress===false){
+    console.log("user add is not set")
+    throw new ApiError(httpStatus.BAD_REQUEST,"User address is not set");
+  }else{
+  let cartTotal = 0;
+  for(let i=0;i<userCart.cartItems.length;i++){
+    let amount = userCart.cartItems[i].product.cost * userCart.cartItems[i].quantity;
+    cartTotal = cartTotal + amount;
+  };
+  if(cartTotal>user.walletMoney){
+    console.log("user bal is low")
+    throw new ApiError(httpStatus.BAD_REQUEST,"Wallet balance insufficient");
+  }
+  user.walletMoney = user.walletMoney - cartTotal;
+  userCart.cartItems = [];
+  await userCart.save();
+  await user.save();
+  console.log(userCart);
+  return userCart
+}
+};
+
 module.exports = {
   getCartByUser,
   addProductToCart,
   updateProductInCart,
   deleteProductFromCart,
+  checkout,
 };
